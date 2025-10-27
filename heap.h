@@ -1,6 +1,7 @@
 //
 // Created by Manju Muralidharan on 10/19/25.
 //
+// Zoe Starace
 
 #ifndef HEAP_H
 #define HEAP_H
