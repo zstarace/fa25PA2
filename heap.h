@@ -38,7 +38,11 @@ struct MinHeap {
             return -1;
         }
         int minIdx = data[0];
-        downheap(0,weightArr);
+        //moving last element to root and then shrink
+        data[0] = data[--size];
+        if (size>0) {
+            downheap(0,weightArr);
+        }
         return minIdx;
     }
 

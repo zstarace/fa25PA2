@@ -130,6 +130,41 @@ void generateCodes(int root, string codes[]) {
     // Left edge adds '0', right edge adds '1'.
     // Record code when a leaf node is reached.
 
+    if (root<0) {
+        return;
+    }
+    if(leftArr[root] == -1 && rightArr[root] == -1) {
+        if (charArr[root] >= 'a' && charArr[root] <= 'z')
+            codes[charArr[root] - 'a'] = "0";
+        return;
+
+    }
+
+    stack<pair<int, string>>  st;
+    st.push({root, ""});
+
+    while (!st.empty()) {
+        auto[node, code] = st.top();
+        st.pop();
+
+        bool isLeaf = (leftArr[node] == -1 && rightArr[node] == -1);
+        if (isLeaf) {
+            if (charArr[node] >= 'a' && charArr[node] <= 'z') {
+                codes[charArr[node]- 'a'] = code.empty() ? "0" : code;
+            }
+
+        }
+        else {
+            if (rightArr[node] != -1) {
+                st.push({rightArr[node], code + "1"});
+            }
+            if (leftArr[node] != -1) {
+                st.push({leftArr[node], code + "0"});
+            }
+        }
+    }
+
+
 }
 
 // Step 5: Print table and encoded message
