@@ -25,20 +25,20 @@ void encodeMessage(const string& filename, string codes[]);
 int main() {
     int freq[26] = {0};
 
-    // Step 1: Read file and count letter frequencies
+    // Read file and count letter frequencies
     buildFrequencyTable(freq, "input.txt");
 
-    // Step 2: Create leaf nodes for each character with nonzero frequency
+    // Create leaf nodes for each character with nonzero frequency
     int nextFree = createLeafNodes(freq);
 
-    // Step 3: Build encoding tree using your heap
+    // Build encoding tree using your heap
     int root = buildEncodingTree(nextFree);
 
-    // Step 4: Generate binary codes using an STL stack
+    // Generate binary codes using an STL stack
     string codes[26];
     generateCodes(root, codes);
 
-    // Step 5: Encode the message and print output
+    // Encode the message and print output
     encodeMessage("input.txt", codes);
 
     return 0;
@@ -48,7 +48,7 @@ int main() {
     Function Definitions (Students will complete logic)
   ------------------------------------------------------*/
 
-// Step 1: Read file and count frequencies
+// Read file and count frequencies
 void buildFrequencyTable(int freq[], const string& filename) {
     ifstream file(filename);
     if (!file.is_open()) {
@@ -71,11 +71,12 @@ void buildFrequencyTable(int freq[], const string& filename) {
     cout << "Frequency table built successfully.\n";
 }
 
-// Step 2: Create leaf nodes for each character
+// Create leaf nodes for each character
 int createLeafNodes(int freq[]) {
     int nextFree = 0;
     for (int i = 0; i < 26; ++i) {
         if (freq[i] > 0) {
+            //fill the parallel arrays for a new leaf node
             charArr[nextFree] = 'a' + i;
             weightArr[nextFree] = freq[i];
             leftArr[nextFree] = -1;
@@ -87,13 +88,12 @@ int createLeafNodes(int freq[]) {
     return nextFree;
 }
 
-// Step 3: Build the encoding tree using heap operations
+//Build the encoding tree using heap operations
 int buildEncodingTree(int nextFree) {
-    // TODO:
-    // 1. Create a MinHeap object.
+    // Create a MinHeap object.
     MinHeap heap;
 
-    // 2. Push all leaf node indices into the heap.
+    // Push all leaf node indices into the heap.
     for (int i = 0; i <nextFree; i++) {
         heap.push (i, weightArr);
     }
@@ -106,6 +106,8 @@ int buildEncodingTree(int nextFree) {
     while (heap.size>1) {
         int a = heap.pop(weightArr);
         int b = heap.pop(weightArr);
+
+        // make a new internal parent node
         if (nextFree>= MAX_NODES) {
             cerr << "Error: too many nodes.\n";
             exit(1);
@@ -115,24 +117,27 @@ int buildEncodingTree(int nextFree) {
         rightArr[p] = b;
         weightArr[p] = weightArr[a] + weightArr[b];
         charArr[p] = '\0';
+        // Push the new parent back into the heap
         heap.push(p, weightArr);
 
     }
 
-    // 4. Return the index of the last remaining node (root)
+    // Return the index of the last remaining node (root)
     return heap.pop(weightArr);
 }
 
-// Step 4: Use an STL stack to generate codes
+// Use an STL stack to generate codes
 void generateCodes(int root, string codes[]) {
-    // TODO:
     // Use stack<pair<int, string>> to simulate DFS traversal.
     // Left edge adds '0', right edge adds '1'.
     // Record code when a leaf node is reached.
 
+    // checks to make sure tree isnt empty
     if (root<0) {
         return;
     }
+
+    // Single-node tree
     if(leftArr[root] == -1 && rightArr[root] == -1) {
         if (charArr[root] >= 'a' && charArr[root] <= 'z')
             codes[charArr[root] - 'a'] = "0";
@@ -149,12 +154,14 @@ void generateCodes(int root, string codes[]) {
 
         bool isLeaf = (leftArr[node] == -1 && rightArr[node] == -1);
         if (isLeaf) {
+            // Store the final code for this character
             if (charArr[node] >= 'a' && charArr[node] <= 'z') {
                 codes[charArr[node]- 'a'] = code.empty() ? "0" : code;
             }
 
         }
         else {
+            // Push right first so left is processed later (LIFO)
             if (rightArr[node] != -1) {
                 st.push({rightArr[node], code + "1"});
             }
@@ -167,8 +174,9 @@ void generateCodes(int root, string codes[]) {
 
 }
 
-// Step 5: Print table and encoded message
+// Print table and encoded message
 void encodeMessage(const string& filename, string codes[]) {
+    //print code table
     cout << "\nCharacter : Code\n";
     for (int i = 0; i < 26; ++i) {
         if (!codes[i].empty())
@@ -176,7 +184,7 @@ void encodeMessage(const string& filename, string codes[]) {
     }
 
     cout << "\nEncoded message:\n";
-
+    //Stream input again and print the codes for letters
     ifstream file(filename);
     char ch;
     while (file.get(ch)) {
